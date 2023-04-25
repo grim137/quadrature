@@ -33,132 +33,31 @@ g = 9.81                  # acceleration due to gravity (m/s^2)
 
 
 #------------------------------------------
-# Read in initial conditions from a file
+#   Gaussian Function
 #------------------------------------------
-def read2C_ary(Location, Column1, Column2):
-    x=[]
-    y=[]
-    crs=open(Location,"r")
-    Np = 0
-    for columns in (raw.strip().split() 
-        for raw in crs):
-            x.append(columns[Column1])
-            y.append(float(columns[Column2]))
-            Np = Np + 1
-    return x, y, Np
+def func1(x, a, b, c):
 
+    y = a * exp((-((x-b)**2 ))/( 2*c) ) 
 
-#--------------------------------------------------
-# Read in initial conditions from a file
-#--------------------------------------------------
-def read3C_ary(Location, Column1, Column2, Column3):
-    x=[]
-    y=[]
-    z=[]
-    crs=open(Location,"r")
-    Np = 0
-    for columns in (raw.strip().split() 
-        for raw in crs):
-            x.append(float(columns[Column1]))
-            y.append(float(columns[Column2]))
-            z.append(float(columns[Column3]))
-            Np = Np + 1
-    return x, y, z, Np
-
-
-#--------------------------------------------------
-# Read in initial conditions from a file
-#--------------------------------------------------
-def read4C_ary(Location, Column1, Column2, Column3, Column4):
-    w=[]
-    x=[]
-    y=[]
-    z=[]
-    crs=open(Location,"r")
-    Np = 0
-    for columns in (raw.strip().split() 
-        for raw in crs):
-            w.append(float(columns[Column1]))
-            x.append(float(columns[Column2]))
-            y.append(float(columns[Column3]))
-            z.append(float(columns[Column4]))
-            Np = Np + 1
-    return w, x, y, z, Np
-
-
-#--------------------------------------------------
-# Read in initial conditions from a file
-#--------------------------------------------------
-def read5C_ary(Location, Column1, Column2, Column3, Column4, Column5):
-    v=[]
-    w=[]
-    x=[]
-    y=[]
-    z=[]
-    crs=open(Location,"r")
-    Np = 0
-    for columns in (raw.strip().split() 
-        for raw in crs):
-            v.append(float(columns[Column1]))
-            w.append(float(columns[Column2]))
-            x.append(float(columns[Column3]))
-            y.append(float(columns[Column4]))
-            z.append(float(columns[Column5]))
-            Np = Np + 1
-    return v, w, x, y, z, Np
+    return y
 
 
 #------------------------------------------
-#   Frequency Modulation (Chirping) 1D
+#   Gaussian Integral
 #------------------------------------------
-def FM1D(t,a,S,erft):
-    f0 = 1/(1+((a**2)/2))
-    FM = f0*(1+(sqrt(pi)*erft*((S*(a**2)))/(4*(c*t))))
-    return FM
+def Int1(a, b, c):
 
-
-#-------------------------------------------
-# Efficient evaluation of an error function
-#-------------------------------------------
-def erf(x):
-    a1 = 0.254829592
-    a2 = -0.284496736
-    a3 = 1.421413741
-    a4 = -1.453152027
-    a5 = 1.061405429
-    p = 0.3275911
-    sgn = 1
-    if x < 0:
-        sgn = -1
-    x = abs(x)
-    t = 1.0/(1.0+p*x)
-    y = 1.0 - (((((a5*t + a4)*t)+a3)*t + a2)*t +a1) *t*exp(-x*x)
-    return sgn*y;
-
+    I = a * c * sqrt(2*pi)
+    return I
 
 #------------------------------------------
-#   Frequency Modulation (Chirping) 1D
+#   Quadratic
 #------------------------------------------
-def projectile(v_0,theta, N):
+def func2(x, a, b, c):
 
-    x = []
-    y = []
-    vx = []
-    vy = []
+    y = a * x**2 + b * x +c    
 
-    t_f = (2*v_0*sin(theta))/g
-
-    print('t_f = ', t_f)
-    t = 0
-
-    for i in range (0,N+1):
-        t = t_f * ((i)/N)
-        x.append(v_0 * cos(theta) * t)
-        vx.append(v_0 * cos(theta))
-        y.append((v_0 * sin(theta) * t )- (0.5 * g * t**2))
-        vy.append(v_0 * sin(theta) * t - g * t)
-
-    return x,y,vx,vy
+    return y
 
 
 
@@ -166,53 +65,53 @@ def projectile(v_0,theta, N):
 # MAIN PROGRAM
 #=================
 
-Nout = 100
-launch_speed = 15.3
-launch_deg = 72
-launch_angle = launch_deg*(2*pi/360)
+# Base Function
 
-v0_x = launch_speed*cos(launch_angle)
-v0_y = launch_speed*sin(launch_angle)
+Nout = 7
+x_min = -10
+x_max = 10
+step = (x_max-x_min)/Nout
 
-x, y, vx, vy = projectile(launch_speed, launch_angle, Nout)
+y = []
+x = []
 
-UP = max(max(x),max(y))*1.1
-DOWN = max(y)*0.1
-LEFT = 1
-RIGHT = max(max(x),max(y))*1.1
+A = 1
+B = 1
+C = 1
 
-soa = np.array([[0, 0, RIGHT, 0], [0, 0, 0, UP], [0, 0, -LEFT, 0],[0,0,0,-DOWN]])
-X, Y, U, V = zip(*soa)
-soa = np.array([[0, 0, (RIGHT*0.1*v0_x/launch_speed), (RIGHT*0.1*v0_y/launch_speed)], [0, 0, 0, 0], [0, 0, 0, 0],[0,0,0,0]])
-A, B, C, D = zip(*soa)
+for i in range(0, Nout):
+    x.append(x_min+ i * step)
+    y.append(func1(x[i],A,B,C))
+
+
+# Quadrature: Riemann Sum
+
+integral = 0
+
+for i in range(1, Nout):
+    integral = integral + y[i] * step
+
+#print('Analytic Integral = ', Int1(A,B,C))
+#print('Quadrature Integral= ', integral)
+
+
+# Generate Plot
 
 fig, ax = plt.subplots(figsize =(7,7))
 
-ax.tick_params(axis = 'x', which = 'both', bottom=False, top = False, labelbottom = False)
-ax.tick_params(axis = 'y', which = 'both', left=False, right = False, labelleft = False)
+#ax.set_xlabel(r'Horizontal Position [m]')
+#ax.set_ylabel(r'Vertical Position [m]')
 
-v0color = '#f7022a'
-trajcolor = '#56ae57'
+ax.plot(x,y, 'r', label = 'Trajectory')
 
-#ax.set_xticks(np.arange(-LEFT,RIGHT+1, step = 1))
-#ax.set_yticks(np.arange(-DOWN,UP+1, step = 1))
-ax.set_xlabel(r'Horizontal Position [m]')
-ax.set_ylabel(r'Vertical Position [m]')
-#ax.plot(x_axis,x_axisy, linewidth=2, color = 'k')
-#ax.plot(y_axisx,y_axis, linewidth=2, color = 'k')
-ax.quiver(X, Y, U, V, angles='xy', scale_units='xy', scale=1, color=['k','k','k','k'])
-ax.quiver(A, B, C, D,  angles='xy', scale_units='xy', scale=1, color=[v0color,'g','b','c'])
-ax.plot(0,0, color = v0color,label = '$v_0$=%.*f m/s'%(2, launch_speed))
-ax.plot(x,y, ':', color = trajcolor, label = 'Trajectory')
-ax.plot(0,0, 'k',label = 'Launch Angle %i $^0$ '%launch_deg)
-#ax.plot(0,0, 'c',label = 'D')
-ax.set_xlim([-LEFT, RIGHT])
-ax.set_ylim([-DOWN, UP])
+ax.set_xlim(x_min, x_max)
+#ax.set_ylim(x_min, UP])
+
 ax.grid(linewidth = 0.5, color ='#4e5481')
-ax.legend(borderpad=0.5, fontsize = 12, loc =9)
+#ax.legend(borderpad=0.5, fontsize = 12, loc =9)
 plt.show()
 
 
-plt.savefig('vector2D.pdf', format='pdf', dpi=2000)
+plt.savefig('quadrature.pdf', format='pdf', dpi=2000)
 
 plt.show()
