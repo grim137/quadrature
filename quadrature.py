@@ -37,7 +37,7 @@ g = 9.81                  # acceleration due to gravity (m/s^2)
 #------------------------------------------
 def func1(x, a, b, c):
 
-    y = a * exp((-((x-b)**2 ))/( 2*c) ) 
+    y = a * exp((-((x-b)**2 ))/( 2*c**2 )) 
 
     return y
 
@@ -60,14 +60,13 @@ def func2(x, a, b, c):
     return y
 
 
-
 #=================
 # MAIN PROGRAM
 #=================
 
 # Base Function
 
-Nout = 7
+Nout = 2
 x_min = -10
 x_max = 10
 step = (x_max-x_min)/Nout
@@ -91,8 +90,8 @@ integral = 0
 for i in range(1, Nout):
     integral = integral + y[i] * step
 
-#print('Analytic Integral = ', Int1(A,B,C))
-#print('Quadrature Integral= ', integral)
+print('Analytic Integral = ', Int1(A,B,C))
+print('Quadrature Integral= ', integral)
 
 
 # Generate Plot
