@@ -37,13 +37,13 @@ g = 9.81                  # acceleration due to gravity (m/s^2)
 #------------------------------------------
 def func1(x, a, b, c):
 
-    y = a * exp((-((x-b)**2 ))/( 2*c) ) 
+    y = a * exp((-((x-b)**2 ))/( 2*c**2 )) 
 
     return y
 
 
 #------------------------------------------
-#   Gaussian Integral
+#   Gaussian Analytic Integral
 #------------------------------------------
 def Int1(a, b, c):
 
@@ -67,7 +67,7 @@ def func2(x, a, b, c):
 
 # Base Function
 
-Nout = 7
+Nout = 100
 x_min = -10
 x_max = 10
 step = (x_max-x_min)/Nout
@@ -81,7 +81,7 @@ C = 1
 
 for i in range(0, Nout):
     x.append(x_min+ i * step)
-    y.append(func1(x[i],A,B,C))
+    y.append(func2(x[i],A,B,C))
 
 
 # Quadrature: Riemann Sum
@@ -102,7 +102,7 @@ fig, ax = plt.subplots(figsize =(7,7))
 #ax.set_xlabel(r'Horizontal Position [m]')
 #ax.set_ylabel(r'Vertical Position [m]')
 
-ax.plot(x,y, 'r', label = 'Trajectory')
+ax.plot(x,y, 'r', label = 'Function')
 
 ax.set_xlim(x_min, x_max)
 #ax.set_ylim(x_min, UP])
