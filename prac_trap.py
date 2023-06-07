@@ -108,7 +108,7 @@ integral = 0
 #for i in range (1, Nout):                           #Trapezoid Rule
     #integral = integral + ((y[i-1] + y[i])/2) * step
 
-for i in range (0, Nout):
+for i in range (0, Nout):                           #Simpson's Rule
     for s in range (2, Nout, 2):
         x_even = y[s] * 2
     for t in range (1, Nout, 2):
